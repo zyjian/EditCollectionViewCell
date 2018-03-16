@@ -28,8 +28,6 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        
-        
         let layou = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
         layou.scrollDirection = .vertical
         layou.minimumLineSpacing = 10
@@ -38,17 +36,7 @@ class ViewController: UIViewController {
         
         collectionView.register(UINib.init(nibName: "ItemCVC", bundle: nil), forCellWithReuseIdentifier: "ItemCVC")
         
-        collectionView.delegate = self as! UICollectionViewDelegate
-        
-        
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
-   
 }
 
 extension ViewController:UICollectionViewDataSource {
@@ -58,7 +46,7 @@ extension ViewController:UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell:ItemCVC = collectionView.dequeueReusableCell(withReuseIdentifier: "ItemCVC", for: indexPath) as! ItemCVC
         cell.backgroundColor = indexPath.item % 2 == 0 ? UIColor.red:UIColor.blue
-        cell.titleLab.text = self.dataArray[indexPath.item] as! String
+        cell.titleLab.text = self.dataArray[indexPath.item] as? String
         cell.delegate = self
         
         return cell
@@ -71,16 +59,17 @@ extension ViewController:ItemCVCProtocl {
         let cell:ItemCVC = long.view as! ItemCVC
         
         if long.state == .began {//长按开始
+            
             //获取截图cell
             snapshotView = cell.snapshotView(afterScreenUpdates: true)!
             snapshotView?.center = cell.center
             collectionView.addSubview(snapshotView!)
 
-        
             indexPathP = collectionView.indexPath(for: cell)!
             originalCell = cell
             originalCell.isHidden = true
             startPoint = long.location(in: collectionView)
+            //colllectionViewAnimateCell(isgo: true)
         }else if(long.state == .changed){
             //移动
             let tranx : CGFloat = long.location(ofTouch: 0, in: collectionView).x - startPoint.x
@@ -97,8 +86,7 @@ extension ViewController:ItemCVCProtocl {
                 }
                 //计算中心距
                 let space:CGFloat = sqrt(pow(snapshotView!.center.y-cell.center.y,2)+pow(snapshotView!.center.x-cell.center.x,2))
-                print(space)
-                
+               
                 //如果相交一半且两个视图Y的绝对值小于高度的一半就移动
                 if space <= snapshotView!.bounds.width * 0.5
                     && (fabs(snapshotView!.center.y - cell.center.y) <= snapshotView!.bounds.height * 0.5) {
@@ -106,19 +94,16 @@ extension ViewController:ItemCVCProtocl {
                     if nextIndexPathP.item > indexPathP.item {
                         for  i in indexPathP.item..<nextIndexPathP.item {
                             self.dataArray.exchangeObject(at: i, withObjectAt: i+1)
-
                         }
                     }else{
                         for  i in (nextIndexPathP.item ..< indexPathP.item).reversed() {
                             self.dataArray.exchangeObject(at: i, withObjectAt: i - 1)
                         }
                     }
-                    
                     //移动
                     collectionView.moveItem(at: indexPathP, to: nextIndexPathP)
                     indexPathP = nextIndexPathP;
                     break;
-
 
                 }
             }
@@ -126,6 +111,23 @@ extension ViewController:ItemCVCProtocl {
         }else if long.state == .ended {
             snapshotView?.removeFromSuperview()
             originalCell.isHidden = false
+            //colllectionViewAnimateCell(isgo: false)
+
+        }
+    }
+}
+
+// MARK: -控制抖动
+extension ViewController{
+    
+    func colllectionViewAnimateCell(isgo:Bool){
+        for cell in collectionView.visibleCells {
+            let newcell = cell as! ItemCVC
+            if isgo{
+                newcell.shakeAnimate()
+            }else{
+                newcell.resetAnimate()
+            }
         }
     }
 }

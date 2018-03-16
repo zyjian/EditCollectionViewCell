@@ -31,3 +31,33 @@ class ItemCVC: UICollectionViewCell {
     }
 
 }
+
+// MARK: ----------- 抖动动画
+extension ItemCVC {
+    func shakeAnimate(){
+        //创建动画对象
+        
+        let animate:CABasicAnimation = CABasicAnimation.init(keyPath: "transform.rotation.z")
+        animate.duration = 0.1 //周期时长
+        animate.fromValue = -Double.pi/32
+        animate.toValue = Double.pi/32
+        
+        animate.repeatCount = Float(LONG_MAX)
+        animate.autoreverses = true //恢复原样
+        
+        self.layer.anchorPoint = CGPoint.init(x: 0.5, y: 0.5)
+        self.layer.add(animate, forKey: "rotation")
+    }
+    
+    func resetAnimate() {
+        self.layer.removeAnimation(forKey: "rotation")
+    }
+}
+
+
+
+
+
+
+
+
