@@ -51,13 +51,6 @@ class ViewController: UIViewController {
    
 }
 
-extension ViewController:UICollectionViewDelegate {
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        collectionView.moveItem(at: IndexPath.init(item: 0, section: 0), to: IndexPath.init(item: 10, section: 0))
-
-    }
-}
-
 extension ViewController:UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.dataArray.count
@@ -104,6 +97,7 @@ extension ViewController:ItemCVCProtocl {
                 }
                 //计算中心距
                 let space:CGFloat = sqrt(pow(snapshotView!.center.y-cell.center.y,2)+pow(snapshotView!.center.x-cell.center.x,2))
+                print(space)
                 
                 //如果相交一半且两个视图Y的绝对值小于高度的一半就移动
                 if space <= snapshotView!.bounds.width * 0.5
